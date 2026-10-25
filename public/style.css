@@ -1,0 +1,66 @@
+/* «Фамилья» — нуар 1930-х: чёрный бархат, бордо, латунь. Один тёмный вид. */
+:root{
+  --bg:#0f0a0b; --bg2:#1a1012; --panel:#221517; --panel2:#2c1b1e; --line:#3d282b;
+  --fg:#f1e6d6; --muted:#a8968a; --brass:#c9a24a; --brass2:#e6c672; --wine:#7a1f2b; --wine2:#a3283a;
+  --good:#6fbf8a; --bad:#e0605a; --warn:#e8a64a;
+  --display:"Playfair Display",Georgia,"Times New Roman",serif;
+  --body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.4;
+  background-image:radial-gradient(ellipse at 50% -10%,rgba(122,31,43,.4),transparent 60%),radial-gradient(ellipse at 50% 120%,rgba(201,162,74,.08),transparent 50%);background-attachment:fixed}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--brass2);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:800;margin:0;letter-spacing:.01em;text-wrap:balance}
+.muted{color:var(--muted)}
+.gold{color:var(--brass)}
+
+.btn{border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:10px 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;transition:filter .15s,background .15s}
+.btn:hover{filter:brightness(1.15)}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.btn.brass{background:linear-gradient(180deg,var(--brass2),var(--brass));color:#1a1205;border-color:transparent}
+.btn.wine{background:linear-gradient(180deg,var(--wine2),var(--wine));border-color:transparent}
+.btn.good{background:var(--good);color:#0c1c11;border-color:transparent}
+.btn.ghost{background:transparent}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:8px}
+.btn.big{padding:15px 18px;font-size:17px;width:100%}
+.btn.armed{background:var(--bad);color:#1c0505;border-color:transparent}
+.field{background:#120b0c;border:1px solid var(--line);border-radius:10px;padding:13px 14px;width:100%;font-size:18px}
+
+/* карта */
+.card{position:relative;aspect-ratio:2/3;border-radius:7%/4.7%;overflow:hidden;background:linear-gradient(160deg,var(--panel2),#160d0f);border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.45);flex:none}
+.card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.card .fb{position:absolute;inset:0;padding:10% 8%;display:flex;flex-direction:column;gap:6%;text-align:center;justify-content:center}
+.card .fb b{font-family:var(--display);font-size:clamp(12px,1.15em,22px);color:var(--brass2);line-height:1.1}
+.card .fb small{font-size:.72em;color:var(--muted);line-height:1.25}
+.card.k-blue{background:linear-gradient(160deg,#1c2433,#101622)}
+.card.k-weapon{background:linear-gradient(160deg,#2e2614,#16120a)}
+.card .suit{position:absolute;bottom:2.5%;right:4%;background:rgba(15,10,11,.85);border:1px solid rgba(201,162,74,.5);color:var(--fg);border-radius:6px;padding:1px 5px;font-size:12px;font-weight:700;line-height:1.3;font-variant-numeric:tabular-nums;z-index:2}
+.card .suit.red{color:#ff7d7d}
+.card.sel{outline:3px solid var(--brass2);outline-offset:2px;transform:translateY(-6px)}
+.card.dim{filter:grayscale(.7) brightness(.55)}
+.card.mark{outline:3px solid var(--bad);outline-offset:2px}
+
+.hearts{color:#e24a5a;letter-spacing:1px;font-size:15px;white-space:nowrap}
+.hearts i{font-style:normal;color:#4a2f33}
+.dot{width:8px;height:8px;border-radius:50%;background:#5c4b48;display:inline-block;flex:none}
+.dot.on{background:var(--good);box-shadow:0 0 6px var(--good)}
+.chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:rgba(0,0,0,.25);border-radius:999px;padding:2px 8px;font-size:12px;white-space:nowrap}
+.chip.blue{border-color:#3b5378;color:#b9cdf0}
+.chip.weapon{border-color:#6b5524;color:var(--brass2)}
+.chip.danger{border-color:var(--bad);color:#ffb0aa}
+.role-badge{font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:5px;padding:2px 6px;font-weight:700}
+.r-godfather{background:var(--brass);color:#1a1205}
+.r-guard{background:#2f4a3a;color:#bfe8cd}
+.r-cop{background:#24395e;color:#c6d8ff}
+.r-rat{background:#4b2a52;color:#e8c6f0}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--bad);color:#1c0505;font-weight:600;padding:10px 16px;border-radius:10px;z-index:100;max-width:calc(100% - 32px);text-align:center}
+@media (prefers-reduced-motion:no-preference){
+  .pulse{animation:pulse 1.2s ease-in-out infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(224,96,90,.25),0 0 30px rgba(224,96,90,.45)}}
+}

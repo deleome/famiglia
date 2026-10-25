@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f0a0b">
+<title>Фамилья</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Golos+Text:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/style.css">
+<style>
+.wrap{max-width:620px;margin:0 auto;padding:12px max(14px,env(safe-area-inset-right)) calc(30px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:14px}
+.center{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+.join{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
+.join h1{font-size:46px;color:var(--brass)}
+.top{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center}
+.top .card{width:64px;border-radius:6px;cursor:pointer}
+.top b{font-size:17px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top .sub{font-size:13px;color:var(--muted)}
+.status{border-radius:14px;padding:14px;background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.status.mine{background:linear-gradient(160deg,#3a1a20,#24121a);border-color:var(--wine2)}
+.status.alarm{border-color:var(--bad)}
+.status h2{font-size:21px}
+.status .row{display:flex;gap:8px;flex-wrap:wrap}
+.status .row .btn{flex:1;min-width:140px}
+.hand{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.hand .card{cursor:pointer;font-size:12px;transition:transform .12s}
+.sect-title{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.mytable{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.mytable .card{width:70px;font-size:9px;cursor:pointer}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions .btn{flex:1}
+.others{display:flex;flex-direction:column;gap:6px}
+.pl{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px;border-radius:10px;background:rgba(0,0,0,.22);border:1px solid transparent;cursor:pointer;text-align:left;width:100%}
+.pl .thumb{width:44px;height:44px;border-radius:8px;overflow:hidden;background:var(--panel2);position:relative}
+.pl .thumb img{width:100%;height:160%;object-fit:cover;object-position:50% 12%}
+.pl .nm{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-weight:600}
+.pl .nm span.n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.pl .meta{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.pl .right{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.pl.turn{border-color:var(--brass)}
+.pl.wait{border-color:var(--bad)}
+.pl.dead{opacity:.45}
+.dist{font-family:var(--display);font-size:20px;font-weight:800;color:var(--brass2);line-height:1}
+.dist small{display:block;font-family:var(--body);font-size:10px;font-weight:500;color:var(--muted);letter-spacing:.04em}
+.log{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:3px;border-top:1px solid var(--line);padding-top:10px}
+.log div:first-child{color:var(--fg)}
+.offer{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.offer button{background:none;border:0;padding:0;display:flex;flex-direction:column;gap:8px;text-align:left}
+.offer .card{width:100%;font-size:13px}
+.banner{border-radius:14px;padding:16px;text-align:center;background:linear-gradient(160deg,#3d2d10,#1f160a);border:1px solid var(--brass)}
+.banner h2{color:var(--brass2);font-size:24px}
+.lootrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.lootrow .card{cursor:pointer;font-size:11px}
+/* нижняя шторка */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-height:92vh;overflow-y:auto;background:var(--bg2);border-top:1px solid var(--brass);border-radius:18px 18px 0 0;padding:16px max(16px,env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.sheet-in{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.sheet .big{width:min(62vw,250px);margin:0 auto;font-size:15px}
+.sheet h3{font-size:20px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opts .btn{justify-content:space-between;text-align:left}
+.opts .btn small{font-weight:400;color:var(--muted)}
+.close{align-self:center}
+.pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px}
+.pickgrid .card{cursor:pointer;font-size:10px}
+.evt{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;border:1px solid var(--brass);border-radius:12px;padding:8px;background:linear-gradient(160deg,#2b2010,#160f08)}
+.evt img{width:96px;aspect-ratio:3/2;object-fit:cover;border-radius:7px}
+.evt:not(:has(img)){grid-template-columns:1fr}
+.evt div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.evt .label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.evt b{font-family:var(--display);font-size:18px;color:var(--brass2)}
+.evt span:last-child{font-size:13px}
+.zones{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.zone{border:1px solid var(--line);border-radius:10px;padding:6px 8px;display:flex;flex-direction:column;font-size:12px;background:rgba(0,0,0,.25)}
+.zone b{font-size:14px}.zone span{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zone.mine{border-color:var(--brass)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="sheet-root"></div>
+<script>
+(() => {
+"use strict";
+const app = document.getElementById("app"), sheetRoot = document.getElementById("sheet-root");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+const ROLES = {
+  godfather:["Крёстный отец","Роль открыта всем. +1 жизнь. Цель: уничтожить всех Полицейских и Крыс."],
+  guard:["Телохранитель","Защищайте Крёстного отца. Побеждаете вместе с ним."],
+  cop:["Полицейский","Убейте Крёстного отца. Побеждает вся полиция, даже погибшие."],
+  rat:["Крыса","Останьтесь последним живым. Крёстного отца нужно убрать последним."],
+  journalist:["Журналист","Ни за кого не играете. Узнайте «Допросом» роли 3 игроков (кроме Крёстного отца) и доживите до конца — победите вместе с победителем."]
+};
+let pid = LS.get("fam-pid", null);
+if (!pid || !/^[a-z0-9]{4,20}$/i.test(pid)) { pid = "p" + Math.random().toString(36).slice(2, 12); LS.set("fam-pid", pid); }
+let name = LS.get("fam-name", "");
+let S = null, ver = 0, connected = false, busy = false, sheet = null, lastPromptSig = "";
+
+/* ---------- связь ---------- */
+async function api(path, data){
+  if (busy) return false;
+  busy = true;
+  const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 9000);
+  try {
+    const r = await fetch(path, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data), signal:ctl.signal});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { toast(j.error || "Не получилось"); return false; }
+    return true;
+  } catch(e) { toast("Нет связи с игрой, попробуйте ещё раз"); return false; }
+  finally { busy = false; clearTimeout(tm); }
+}
+const act = a => api("/api/act", {pid, a: {...a, seq: S && S.me && S.me.prompt ? S.me.prompt.seq : undefined}});
+let pollCtl = null;
+// телефон проснулся — сразу обновляем состояние
+document.addEventListener("visibilitychange", () => { if (!document.hidden && pollCtl) { ver = 0; pollCtl.abort(); } });
+async function loop(){
+  for (;;) {
+    try {
+      const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 35000);
+      pollCtl = ctl;
+      const r = await fetch(`/api/poll?pid=${encodeURIComponent(pid)}&v=${ver}`, {cache:"no-store", signal:ctl.signal});
+      clearTimeout(tm);
+      if (!r.ok) throw 0;
+      const j = await r.json();
+      ver = j.v; S = j.s; connected = true;
+      if (name && !S.inGame && !S.lobby.some(p => p.id === pid) && S.lobby.length < 8 && !rejoinTried) { rejoinTried = true; api("/api/join", {pid, name}); }
+      render();
+    } catch(e) {
+      connected = false; render();
+      await new Promise(r => setTimeout(r, 1500));
+    }
+  }
+}
+let rejoinTried = false;
+let toastT = null;
+function toast(t){
+  let el = document.getElementById("toast");
+  if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; document.body.appendChild(el); }
+  el.textContent = t; el.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 2600);
+}
+
+/* ---------- кусочки ---------- */
+function cardHtml(c, cls = "", attrs = ""){
+  const red = c.suit === "♥" || c.suit === "♦";
+  return `<div class="card k-${c.kind || "brown"} ${cls}" ${attrs}><div class="fb"><b>${esc(c.n)}</b><small>${esc(c.d)}</small></div><img src="/card/${c.key}" alt="${esc(c.n)}" loading="lazy" onerror="this.remove()">${c.suit ? `<span class="suit ${red ? "red" : ""}">${c.rank}${c.suit}</span>` : ""}</div>`;
+}
+function charCard(ch, cls = ""){ return `<div class="card ${cls}"><div class="fb"><b>${esc(ch.n)}</b><small>${"♥".repeat(ch.hp)}<br>${esc(ch.d)}</small></div><img src="/card/${ch.key}" alt="${esc(ch.n)}" onerror="this.remove()"></div>`; }
+function roleCard(role, cls = ""){ const r = ROLES[role]; return `<div class="card ${cls}"><div class="fb"><b>${esc(r[0])}</b><small>${esc(r[1])}</small></div><img src="/card/role-${role}" alt="${esc(r[0])}" onerror="this.remove()"></div>`; }
+const hearts = (hp, max) => `<span class="hearts">${"♥".repeat(Math.max(0, hp))}<i>${"♥".repeat(Math.max(0, max - hp))}</i></span>`;
+const roleBadge = r => r ? `<span class="role-badge r-${r}">${ROLES[r][0]}</span>` : "";
+const P = id => S.players.find(p => p.id === id);
+const nm = id => (P(id) || {}).name || "";
+
+/* ---------- экраны ---------- */
+function render(){
+  if (!name) return renderJoin();
+  if (!S) { app.innerHTML = `<div class="center"><p class="muted">${connected ? "Загружаем…" : "Подключаемся к игре…"}</p></div>`; return; }
+  if (!S.inGame) return renderLobby();
+  if (S.phase === "chars") return renderChars();
+  renderGame();
+}
+
+function renderJoin(){
+  app.innerHTML = `<div class="center"><form class="join" id="joinf">
+    <h1>Фамилья</h1>
+    <label class="muted" for="nm">Как вас зовут за столом?</label>
+    <input class="field" id="nm" maxlength="20" autocomplete="nickname" value="${esc(name)}" placeholder="Имя">
+    <button class="btn brass big">Сесть за стол</button>
+  </form></div>`;
+  const f = document.getElementById("joinf");
+  document.getElementById("nm").focus();
+  f.addEventListener("submit", async e => {
+    e.preventDefault();
+    const v = document.getElementById("nm").value.trim();
+    if (!v) return;
+    if (await api("/api/join", {pid, name:v})) { name = v; LS.set("fam-name", v); render(); }
+  });
+}
+
+function renderLobby(){
+  const inLobby = S.lobby.some(p => p.id === pid);
+  const running = S.phase && S.phase !== "lobby" && S.phase !== "over";
+  app.innerHTML = `<div class="wrap">
+    <h1 style="font-size:40px;color:var(--brass)">Фамилья</h1>
+    <div class="status">
+      ${inLobby
+        ? `<h2>${running ? "Идёт партия" : "Вы за столом"}</h2><p class="muted" style="margin:0">${running ? "Вы сыграете в следующей партии." : "Ждём, когда ведущий начнёт игру на ноутбуке."}</p>`
+        : `<h2>Вас нет за столом</h2><p class="muted" style="margin:0">${S.lobby.length >= 8 ? "Мест нет: за столом уже 8 человек." : "Нажмите, чтобы сесть."}</p>${S.lobby.length < 8 ? `<button class="btn brass" id="sit">Сесть за стол</button>` : ""}`}
+    </div>
+    <div class="sect-title"><span>За столом</span><span>${S.lobby.length} из 8</span></div>
+    <div class="others">${S.lobby.map(p => `<div class="pl" style="cursor:default"><div class="thumb"></div><div class="nm"><span class="n">${esc(p.name)}</span>${p.id === pid ? `<span class="chip">вы</span>` : ""}</div><div class="right"><span class="dot ${p.online ? "on" : ""}"></span></div></div>`).join("")}</div>
+    <button class="btn ghost sm" id="rename" style="align-self:center">Сменить имя</button>
+  </div>`;
+  const sit = document.getElementById("sit");
+  if (sit) sit.onclick = () => api("/api/join", {pid, name});
+  document.getElementById("rename").onclick = () => { name = ""; render(); };
+}
+
+function renderChars(){
+  const me = S.me, picked = S.players.filter(p => p.picked).length;
+  app.innerHTML = `<div class="wrap">
+    <div class="status">
+      <div class="sect-title"><span>Ваша роль (никому не показывайте)</span></div>
+      <button class="btn" id="showrole">Показать мою роль</button>
+    </div>
+    ${me.offer ? `
+      <h2>Выберите персонажа</h2>
+      <div class="offer">${me.offer.map((ch, i) => `<button data-i="${i}">${charCard(ch)}<span class="btn brass">Выбрать</span></button>`).join("")}</div>`
+    : `<div class="status"><h2>Персонаж выбран</h2><p class="muted" style="margin:0">Ждём остальных: выбрали ${picked} из ${S.players.length}.</p></div>`}
+  </div>`;
+  document.getElementById("showrole").onclick = () => openSheet({type:"role"});
+  app.querySelectorAll(".offer button").forEach(b => b.onclick = () => act({type:"pickChar", i:+b.dataset.i}));
+  renderSheet();
+}
+
+function promptBox(){
+  const me = S.me, pr = me.prompt;
+  if (S.phase === "over") {
+    return `<div class="banner"><h2>${esc(S.winner ? S.winner.text : "Игра окончена")}</h2><p class="muted" style="margin:6px 0 0">Роли всех игроков открыты ниже.</p></div>`;
+  }
+  if (!me.alive) return `<div class="status"><h2>☠ Вы выбыли</h2><p class="muted" style="margin:0">Следите за игрой: ваша команда ещё может победить.</p></div>`;
+  if (me.mustVote) {
+    return `<div class="status mine alarm pulse"><h2>🗳 Сходка! Кого убрать?</h2><span class="muted">Голос тайный. Набравший больше голосов теряет 2 жизни. Крёстного отца выбрать нельзя.</span>
+      <div class="opts">${me.voteTargets.map(id => `<button class="btn" data-vote="${esc(id)}">${esc(nm(id))}${id === pid ? " (вы)" : ""}</button>`).join("")}<button class="btn ghost" data-vote="">Воздержаться</button></div></div>`;
+  }
+  if (!pr) {
+    const w = S.waiting;
+    return `<div class="status"><span class="muted">${w ? esc(w.text) : "Ждём…"}</span></div>`;
+  }
+  switch (pr.kind) {
+    case "turn": {
+      const extra = me.hand.length - me.limit;
+      return `<div class="status mine"><h2>Ваш ход</h2><span class="muted">Нажмите на карту, чтобы сыграть её.${extra > 0 ? ` В конце хода нужно сбросить ${extra}.` : ""}</span></div>`;
+    }
+    case "dodge": return `<div class="status mine alarm pulse"><h2>${pr.fire ? `Огонь! «Коктейль Молотова» от ${esc(nm(pr.from))}` : `${esc(nm(pr.from))} делает «Заказ» на вас!`}</h2>
+      <span class="muted">${pr.need > 1 ? `Нужно ${pr.need} «Крыши».` : "Нужна «Крыша»."}${pr.dmg > 1 ? ` Попадание отнимет ${pr.dmg} жизни!` : ""}</span>
+      <div class="row">${pr.canDodge ? `<button class="btn good" data-a="dodge">Уйти под «Крышу»</button>` : ""}<button class="btn wine" data-a="take">Принять (−${pr.dmg})</button></div>
+      ${pr.agentTo.length ? `<div class="row">${pr.agentTo.map(id => `<button class="btn" data-agent="${esc(id)}">«Двойной агент» → ${esc(nm(id))}</button>`).join("")}</div>` : ""}</div>`;
+    case "lawyer": return `<div class="status mine pulse"><h2>Вы в багажнике</h2><span class="muted">Позвонить «Адвокату»? Он вытащит вас без проверки.</span>
+      <div class="row"><button class="btn good" data-a="yes">Звонить адвокату</button><button class="btn" data-a="no">Рискнуть (проверка ♥)</button></div></div>`;
+    case "debt": return `<div class="status mine alarm pulse"><h2>Ростовщик пришёл за долгом</h2><span class="muted">Верните 3 карты или потеряете 1 жизнь.</span>
+      <div class="row">${pr.canDodge ? `<button class="btn good" id="paydebt">Вернуть 3 карты</button>` : ""}<button class="btn wine" data-a="nopay">Не платить (−1)</button></div></div>`;
+    case "raid": return `<div class="status mine alarm pulse"><h2>Облава!</h2><span class="muted">Сбросьте «Заказ» или потеряете жизнь.</span>
+      <div class="row"><button class="btn good" data-a="dodge">Сбросить «Заказ»</button><button class="btn wine" data-a="take">Потерять жизнь</button></div></div>`;
+    case "showdown": return `<div class="status mine alarm pulse"><h2>Разборка с ${esc(nm(pr.vs))}</h2><span class="muted">Ваша очередь: сбросьте «Заказ» или проиграйте (−1 жизнь).</span>
+      <div class="row"><button class="btn good" data-a="dodge">Сбросить «Заказ»</button><button class="btn wine" data-a="take">Сдаться</button></div></div>`;
+    case "revenge": return `<div class="status mine pulse"><h2>Отомстить ${esc(nm(pr.vs))}?</h2><span class="muted">Ответный «Заказ» на любую дистанцию. Потратите одну карту «Заказ».</span>
+      <div class="row"><button class="btn good" data-a="yes">Мстить!</button><button class="btn" data-a="no">Не сейчас</button></div></div>`;
+    case "tino": return `<div class="status mine"><h2>Отдайте одну карту</h2><span class="muted">Выберите карту из новых, затем кому её отдать.</span>
+      <div class="lootrow">${pr.cards.map(c => cardHtml(c, sheet && sheet.tinoCard === c.id ? "sel" : "", `data-tino="${c.id}"`)).join("")}</div>
+      ${sheet && sheet.tinoCard != null ? `<div class="opts">${S.players.filter(p => p.alive && p.id !== pid).map(p => `<button class="btn" data-to="${esc(p.id)}">Отдать: ${esc(p.name)}</button>`).join("")}</div>` : ""}</div>`;
+    case "loot": return `<div class="status mine"><h2>Делёж добычи</h2><span class="muted">Выберите себе карту.</span>
+      <div class="lootrow">${(S.loot || []).map(c => cardHtml(c, "", `data-loot="${c.id}"`)).join("")}</div></div>`;
+  }
+  return "";
+}
+
+function renderGame(){
+  const me = S.me, mine = S.players.find(p => p.id === pid);
+  const pr = me.prompt, myTurn = pr && pr.kind === "turn";
+  const sig = pr ? pr.kind + (pr.from || "") + (pr.vs || "") : "";
+  if (sig && sig !== lastPromptSig) { try { navigator.vibrate && navigator.vibrate(pr.kind === "turn" ? 60 : [120, 60, 120]); } catch(e) {} }
+  lastPromptSig = sig;
+  const playable = me.playable || {};
+  const seatIdx = S.players.findIndex(p => p.id === pid);
+  const order = S.players.slice(seatIdx + 1).concat(S.players.slice(0, seatIdx));
+  const extra = me.hand.length - me.limit;
+  app.innerHTML = `<div class="wrap">
+    <div class="top">
+      ${mine.char ? charCard(mine.char, "") .replace('class="card ', 'class="card mychar ') : ""}
+      <div style="min-width:0"><b>${esc(mine.name)}</b><div class="sub">${esc(mine.char ? mine.char.n : "")}</div>${hearts(mine.hp, mine.max)}</div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <button class="btn sm" id="role">Моя роль</button>
+        <span class="sub" style="font-size:12px">${connected ? "" : "нет связи · "}дальность ${mine.range}</span>
+      </div>
+    </div>
+    ${promptBox()}
+    ${S.event ? `<div class="evt"><img src="/card/ev-${S.event.key}" alt="" onerror="this.remove()"><div><span class="label">Событие круга</span><b>${esc(S.event.n)}</b><span>${esc(S.event.d)}</span></div></div>` : ""}
+    ${S.zones ? `<div class="zones">${S.zones.map(z => `<div class="zone ${z.owner === pid ? "mine" : ""}" title="${esc(z.d)}"><b>${esc(z.n)}</b><span>${z.owner ? esc(nm(z.owner)) : "свободен"}</span></div>`).join("")}</div>` : ""}
+    <div class="sect-title"><span>Карты в руке</span><span>${me.hand.length} / лимит ${me.limit}</span></div>
+    <div class="hand">${me.hand.map(c => cardHtml(c, myTurn && !(playable[c.id] || []).length ? "dim" : "", `data-card="${c.id}"`)).join("") || `<span class="muted">Карт нет</span>`}</div>
+    ${myTurn ? `<div class="actions">
+      <button class="btn brass" id="end">${extra > 0 ? `Сбросить ${extra} и закончить ход` : "Закончить ход"}</button>
+      ${me.swapsLeft > 0 ? `<button class="btn" id="swap">Сменить карту (${me.swapsLeft})</button>` : ""}
+      ${me.extras && me.extras.casino ? `<button class="btn" id="casino">Казино: сменить карту</button>` : ""}
+      ${me.extras && me.extras.zones.length ? `<button class="btn" id="zone">Занять район</button>` : ""}
+      ${me.extras && me.extras.loan ? `<button class="btn" id="loan">Взять в долг (+2)</button>` : ""}
+      ${me.extras && me.extras.shodka ? `<button class="btn wine" id="shodka">Созвать сходку</button>` : ""}
+    </div>` : ""}
+    ${me.canSpy ? `<button class="btn" id="spy">Навести справки (узнать роль)</button>` : ""}
+    ${mine.inPlay.length ? `<div class="sect-title"><span>На столе перед вами</span></div><div class="mytable">${mine.inPlay.map(c => cardHtml(c, "", `data-view="${c.id}"`)).join("")}</div>` : ""}
+    <div class="sect-title"><span>Игроки по кругу</span><span>дистанция от вас</span></div>
+    <div class="others">${order.map(p => playerRow(p)).join("")}</div>
+    <div class="log">${S.log.slice(-8).reverse().map(t => `<div>${esc(t)}</div>`).join("")}</div>
+  </div>`;
+  bindGame();
+  renderSheet();
+}
+
+function playerRow(p){
+  const w = S.waiting && S.waiting.pid === p.id && S.waiting.kind !== "turn" && S.phase === "play";
+  const inPlay = p.inPlay.map(c => `<span class="chip ${c.kind === "weapon" ? "weapon" : c.key === "trunk" || c.key === "c4" ? "danger" : "blue"}">${esc(c.n)}</span>`).join("");
+  return `<button class="pl ${p.alive ? "" : "dead"} ${S.turn === p.id && p.alive ? "turn" : ""} ${w ? "wait" : ""}" data-player="${esc(p.id)}">
+    <div class="thumb">${p.char ? `<img src="/card/${p.char.key}" alt="" onerror="this.remove()">` : ""}</div>
+    <div style="min-width:0">
+      <div class="nm"><span class="n">${p.alive ? "" : "☠ "}${esc(p.name)}</span>${roleBadge(p.role)}${S.turn === p.id && p.alive ? `<span class="chip">ходит</span>` : ""}</div>
+      <div class="meta">${p.alive ? hearts(p.hp, p.max) : ""}<span class="chip">🂠 ${p.hand}</span>${inPlay}${p.zone ? `<span class="chip weapon">🏙 ${esc((S.zones.find(z => z.key === p.zone) || {}).n || "")}</span>` : ""}${p.debt != null ? `<span class="chip danger">долг: ${p.debt}</span>` : ""}${p.noShoot ? `<span class="chip danger">компромат от ${esc(nm(p.noShoot))}</span>` : ""}</div>
+    </div>
+    <div class="right">${p.dist != null ? `<div class="dist">${p.dist}<small>дист.</small></div>` : ""}</div>
+  </button>`;
+}
+
+function bindGame(){
+  const me = S.me, pr = me.prompt;
+  const mc = app.querySelector(".mychar"); if (mc) mc.onclick = () => openSheet({type:"player", id:pid});
+  document.getElementById("role").onclick = () => openSheet({type:"role"});
+  app.querySelectorAll("[data-card]").forEach(el => el.onclick = () => openSheet({type:"card", id:+el.dataset.card}));
+  app.querySelectorAll("[data-view]").forEach(el => el.onclick = () => openSheet({type:"view", id:+el.dataset.view}));
+  app.querySelectorAll("[data-player]").forEach(el => el.onclick = () => openSheet({type:"player", id:el.dataset.player}));
+  const end = document.getElementById("end");
+  if (end) end.onclick = () => {
+    const extra = me.hand.length - me.limit;
+    if (extra > 0) openSheet({type:"discard", sel:[]});
+    else act({type:"end"});
+  };
+  const swap = document.getElementById("swap"); if (swap) swap.onclick = () => openSheet({type:"swap"});
+  const spy = document.getElementById("spy"); if (spy) spy.onclick = () => openSheet({type:"spy"});
+  const cas = document.getElementById("casino"); if (cas) cas.onclick = () => openSheet({type:"casino"});
+  const zn = document.getElementById("zone"); if (zn) zn.onclick = () => openSheet({type:"zone"});
+  const ln = document.getElementById("loan"); if (ln) ln.onclick = () => act({type:"loan"});
+  const sh = document.getElementById("shodka"); if (sh) sh.onclick = () => openSheet({type:"shodka"});
+  const pd = document.getElementById("paydebt"); if (pd) pd.onclick = () => openSheet({type:"debt", sel:[]});
+  app.querySelectorAll("[data-vote]").forEach(b => b.onclick = () => act({type:"vote", target:b.dataset.vote || null}));
+  app.querySelectorAll("[data-agent]").forEach(b => b.onclick = () => act({agent:b.dataset.agent}));
+  app.querySelectorAll(".status [data-a]").forEach(b => b.onclick = () => {
+    const a = b.dataset.a;
+    if (a === "dodge") act({dodge:true}); else if (a === "take") act({dodge:false});
+    else if (a === "yes") act({yes:true}); else if (a === "no") act({yes:false});
+    else if (a === "nopay") act({pay:false});
+  });
+  app.querySelectorAll("[data-loot]").forEach(el => el.onclick = () => act({card:+el.dataset.loot}));
+  app.querySelectorAll("[data-tino]").forEach(el => el.onclick = () => { sheet = {type:"tino", tinoCard:+el.dataset.tino}; render(); });
+  app.querySelectorAll("[data-to]").forEach(el => el.onclick = async () => { if (await act({card:sheet.tinoCard, to:el.dataset.to})) { sheet = null; render(); } });
+}
+
+/* ---------- шторка ---------- */
+function openSheet(s){ sheet = s; renderSheet(); }
+function closeSheet(){ sheet = null; renderSheet(); }
+function renderSheet(){
+  if (!sheet || sheet.type === "tino" || !S || !S.me) { sheetRoot.innerHTML = ""; return; }
+  const me = S.me, pr = me.prompt, myTurn = pr && pr.kind === "turn";
+  let html = "";
+  if (sheet.type === "role") {
+    html = `${roleCard(me.role, "big")}<h3 style="text-align:center">${ROLES[me.role][0]}</h3><p class="muted" style="margin:0;text-align:center">${ROLES[me.role][1]}</p>
+      ${me.known ? `<p style="margin:0;text-align:center"><b>Сенсация: ${me.known.length} из 3</b> ${me.known.length >= 3 ? "— доживите до конца игры!" : ""}</p>` : ""}
+      ${(me.seen || []).length ? `<div class="opts">${me.seen.map(id => `<div class="btn" style="cursor:default"><span>${esc(nm(id))}</span>${roleBadge((P(id) || {}).role)}</div>`).join("")}</div>` : ""}`;
+  }
+  if (sheet.type === "player") {
+    const p = P(sheet.id); if (!p) return closeSheet();
+    html = `${p.char ? charCard(p.char, "big") : ""}<h3 style="text-align:center">${esc(p.name)} ${roleBadge(p.role)}</h3>
+      <p class="muted" style="margin:0;text-align:center">${p.alive ? `Жизни ${p.hp} из ${p.max} · карт в руке ${p.hand} · дальность ${p.range}${p.dist != null ? ` · до вас ${p.dist}` : ""}` : "Выбыл"}</p>
+      ${p.inPlay.length ? `<div class="pickgrid">${p.inPlay.map(c => cardHtml(c)).join("")}</div>` : ""}`;
+  }
+  if (sheet.type === "view") {
+    const c = S.players.flatMap(p => p.inPlay).find(c => c.id === sheet.id);
+    if (!c) return closeSheet();
+    html = cardHtml(c, "big");
+  }
+  if (sheet.type === "card") {
+    const c = me.hand.find(c => c.id === sheet.id);
+    if (!c) return closeSheet();
+    var card0 = c;
+    const opts = (me.playable && me.playable[c.id]) || [];
+    html = cardHtml(c, "big");
+    if (!myTurn) html += `<p class="muted" style="margin:0;text-align:center">${esc(c.d)}</p>`;
+    else if (!opts.length) html += `<p class="muted" style="margin:0;text-align:center">Эту карту сейчас нельзя сыграть.</p>`;
+    else if (!sheet.opt) {
+      html += `<div class="opts">${opts.map((o, i) => `<button class="btn brass" data-opt="${i}">${esc(o.label === "Сыграть" ? "Сыграть «" + c.n + "»" : o.label)}${o.targets ? `<small>выбрать цель</small>` : ""}</button>`).join("")}</div>`;
+    } else {
+      const o = sheet.opt;
+      if (sheet.target == null) {
+        html += `<h3>Кого выбрать?</h3><div class="opts">${o.targets.map(tid => { const t = P(tid); return `<button class="btn" data-target="${esc(tid)}"><span>${esc(t.name)} ${hearts(t.hp, t.max)}</span><small>${t.id === pid ? "вы" : "дист. " + t.dist}</small></button>`; }).join("")}</div>`;
+      } else if (o.give) {
+        html += `<h3>Какую карту отдать ${esc(nm(sheet.target))}?</h3><div class="pickgrid">${me.hand.filter(x => x.id !== card0.id).map(x => cardHtml(x, "", `data-give="${x.id}"`)).join("")}</div>`;
+      } else {
+        const t = P(sheet.target);
+        html += `<h3>Какую карту у ${esc(t.name)}?</h3><div class="opts">
+          ${t.hand ? `<button class="btn" data-pick="hand">Случайную из руки <small>${t.hand} шт.</small></button>` : ""}
+          ${t.inPlay.map(x => `<button class="btn" data-pick="${x.id}">${esc(x.n)} <small>со стола</small></button>`).join("")}</div>`;
+      }
+    }
+  }
+  if (sheet.type === "discard") {
+    const need = me.hand.length - me.limit;
+    html = `<h3>Сбросьте ${need} ${need === 1 ? "карту" : need < 5 ? "карты" : "карт"}</h3><span class="muted">Отмечено: ${sheet.sel.length} из ${need}</span>
+      <div class="pickgrid">${me.hand.map(c => cardHtml(c, sheet.sel.includes(c.id) ? "mark" : "", `data-sel="${c.id}"`)).join("")}</div>
+      <button class="btn brass big" id="do-discard" ${sheet.sel.length === need ? "" : "disabled"}>Сбросить и закончить ход</button>`;
+  }
+  if (sheet.type === "swap") {
+    html = `<h3>Какую карту сменить?</h3><div class="pickgrid">${me.hand.map(c => cardHtml(c, "", `data-swap="${c.id}"`)).join("")}</div>`;
+  }
+  if (sheet.type === "casino") {
+    html = `<h3>Казино: какую карту сменить?</h3><div class="pickgrid">${me.hand.map(c => cardHtml(c, "", `data-casino="${c.id}"`)).join("")}</div>`;
+  }
+  if (sheet.type === "zone") {
+    const zs = (me.extras && me.extras.zones) || [];
+    if (!sheet.zone) html = `<h3>Какой район занять?</h3><p class="muted" style="margin:0">Цена — любая карта из руки. Если вас ранят, район освободится.</p><div class="opts">${zs.map(k => { const z = S.zones.find(x => x.key === k); return `<button class="btn" data-zone="${k}"><span>${esc(z.n)}</span><small>${esc(z.d)}</small></button>`; }).join("")}</div>`;
+    else html = `<h3>Какую карту отдать за район?</h3><div class="pickgrid">${me.hand.map(c => cardHtml(c, "", `data-zcard="${c.id}"`)).join("")}</div>`;
+  }
+  if (sheet.type === "shodka") {
+    html = `<h3>Созвать сходку?</h3><p class="muted" style="margin:0">Все живые тайно голосуют, кого убрать (не Крёстного отца). Набравший больше голосов теряет 2 жизни. Сходку можно созвать только один раз за игру.</p>
+      <button class="btn wine big" id="do-shodka">Созвать</button>`;
+  }
+  if (sheet.type === "debt") {
+    html = `<h3>Верните 3 карты ростовщику</h3><span class="muted">Отмечено: ${sheet.sel.length} из 3</span>
+      <div class="pickgrid">${me.hand.map(c => cardHtml(c, sheet.sel.includes(c.id) ? "mark" : "", `data-dsel="${c.id}"`)).join("")}</div>
+      <button class="btn brass big" id="do-debt" ${sheet.sel.length === 3 ? "" : "disabled"}>Вернуть</button>`;
+  }
+  if (sheet.type === "spy") {
+    html = `<h3>Чью роль узнать?</h3><p class="muted" style="margin:0">Это можно сделать только один раз за игру.</p>
+      <div class="opts">${S.players.filter(p => p.id !== pid).map(p => `<button class="btn" data-spy="${esc(p.id)}">${esc(p.name)}</button>`).join("")}</div>`;
+  }
+  sheetRoot.innerHTML = `<div class="scrim" id="scrim"></div><div class="sheet" role="dialog"><div class="sheet-in">${html}<button class="btn ghost close" id="sclose">${sheet.opt ? "Назад" : "Закрыть"}</button></div></div>`;
+  document.getElementById("scrim").onclick = closeSheet;
+  document.getElementById("sclose").onclick = () => { if (sheet.target != null) { sheet.target = null; renderSheet(); } else if (sheet.opt) { sheet.opt = null; renderSheet(); } else closeSheet(); };
+  const card = sheet.type === "card" ? me.hand.find(c => c.id === sheet.id) : null;
+  sheetRoot.querySelectorAll("[data-opt]").forEach(b => b.onclick = async () => {
+    const o = me.playable[card.id][+b.dataset.opt];
+    if (!o.targets) { if (await act({type:"play", card:card.id, as:o.as})) closeSheet(); return; }
+    sheet.opt = o; renderSheet();
+  });
+  sheetRoot.querySelectorAll("[data-target]").forEach(b => b.onclick = async () => {
+    const t = b.dataset.target;
+    if (sheet.opt.pick || sheet.opt.give) { sheet.target = t; renderSheet(); return; }
+    if (await act({type:"play", card:card.id, as:sheet.opt.as, target:t})) closeSheet();
+  });
+  sheetRoot.querySelectorAll("[data-give]").forEach(el => el.onclick = async () => {
+    if (await act({type:"play", card:card.id, as:sheet.opt.as, target:sheet.target, give:+el.dataset.give})) closeSheet();
+  });
+  sheetRoot.querySelectorAll("[data-pick]").forEach(b => b.onclick = async () => {
+    const pick = b.dataset.pick === "hand" ? "hand" : +b.dataset.pick;
+    if (await act({type:"play", card:card.id, as:sheet.opt.as, target:sheet.target, pick})) closeSheet();
+  });
+  sheetRoot.querySelectorAll("[data-sel]").forEach(el => el.onclick = () => {
+    const id = +el.dataset.sel, need = me.hand.length - me.limit;
+    if (sheet.sel.includes(id)) sheet.sel = sheet.sel.filter(x => x !== id);
+    else if (sheet.sel.length < need) sheet.sel.push(id);
+    renderSheet();
+  });
+  const dd = document.getElementById("do-discard");
+  if (dd) dd.onclick = async () => { if (await act({type:"end", discard:sheet.sel})) closeSheet(); };
+  sheetRoot.querySelectorAll("[data-swap]").forEach(el => el.onclick = async () => { if (await act({type:"swap", card:+el.dataset.swap})) closeSheet(); });
+  sheetRoot.querySelectorAll("[data-casino]").forEach(el => el.onclick = async () => { if (await act({type:"casino", card:+el.dataset.casino})) closeSheet(); });
+  sheetRoot.querySelectorAll("[data-zone]").forEach(el => el.onclick = () => { sheet.zone = el.dataset.zone; renderSheet(); });
+  sheetRoot.querySelectorAll("[data-zcard]").forEach(el => el.onclick = async () => { if (await act({type:"zone", zone:sheet.zone, card:+el.dataset.zcard})) closeSheet(); });
+  const ds = document.getElementById("do-shodka"); if (ds) ds.onclick = async () => { if (await act({type:"shodka"})) closeSheet(); };
+  sheetRoot.querySelectorAll("[data-dsel]").forEach(el => el.onclick = () => {
+    const id = +el.dataset.dsel;
+    if (sheet.sel.includes(id)) sheet.sel = sheet.sel.filter(x => x !== id); else if (sheet.sel.length < 3) sheet.sel.push(id);
+    renderSheet();
+  });
+  const dbt = document.getElementById("do-debt"); if (dbt) dbt.onclick = async () => { if (await act({pay:true, cards:sheet.sel})) closeSheet(); };
+  sheetRoot.querySelectorAll("[data-spy]").forEach(b => b.onclick = async () => { if (await act({type:"spy", target:b.dataset.spy})) openSheet({type:"role"}); });
+}
+
+document.addEventListener("keydown", e => { if (e.key === "Escape" && sheet) closeSheet(); });
+render();
+loop();
+})();
+</script>
+</body>
+</html>
